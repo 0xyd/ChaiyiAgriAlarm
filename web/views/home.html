@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>諸羅阿郎</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 100%;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      aside {
+        position: fixed;
+        right: 100px;
+        top  :  10px;
+      }
+      .panel-body > ul {
+        padding: 0px;
+      }
+      .panel-body > ul > li {
+        list-style: none;
+      }
+    </style>
+  </head>
+  <body>
+    <header></header>
+    <section id="map"></section>
+    <aside>
+      <div id="AreaSelector" class="dropdown">
+        <button id="CurrentAreaViewer" class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+          選擇鄉鎮
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+          <li><a id="all_chaiyi" href="#">嘉義全縣</a></li>
+          <li role="separator" class="divider"></li>
+          <li><a id="東石鄉" href="#">東石鄉</a></li>
+          <li><a href="#">布袋鎮</a></li>
+          <li><a href="#">六腳鄉</a></li>
+          <li><a href="#">義竹鄉</a></li>
+          <li><a href="#">鹿草鄉</a></li>
+          <li><a href="#">朴子市</a></li>
+          <li><a href="#">太保市</a></li>
+          <li><a href="#">新港鄉</a></li>
+          <li><a href="#">溪口鄉</a></li>
+          <li><a href="#">大林鎮</a></li>
+          <li><a href="#">民雄鄉</a></li>
+          <li><a href="#">梅山鄉</a></li>
+          <li><a href="#">竹崎鄉</a></li>
+          <li><a href="#">阿里山鄉</a></li>
+          <li><a href="#">番路鄉</a></li>
+          <li><a href="#">大埔鄉</a></li>
+          <li><a href="#">中埔鄉</a></li>
+          <li><a href="#">水上鄉</a></li>
+        </ul>
+      </div>
+      <div id="AgriLandSelector" class="dropdown">
+        <button id="CurrentAgriLandViewer" class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+          選擇農地
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+          <li><a href="#">農地自然生產力</a></li>
+          <li id="prod_4">
+            <a href="#"><input id="prod_4" type="checkbox" class="prod_level" name="">
+              自然生產力第4級
+            </a>
+          </li>
+          <li id="prod_5">
+            <a href="#"><input id="prod_5" type="checkbox" class="prod_level" name="">
+              自然生產力第5級
+            </a>
+          </li>
+          <li id="prod_6">
+            <a href="#"><input id="prod_6" type="checkbox" class="prod_level" name="">
+              自然生產力第6級
+            </a>
+          </li>
+          <li id="prod_7">
+            <a href="#"><input id="prod_7" type="checkbox" class="prod_level" name="">
+              自然生產力第7級
+            </a>
+          </li>
+          <li id="prod_8">
+            <a href="#"><input id="prod_8" type="checkbox" class="prod_level" name="">
+              自然生產力第8級
+            </a>
+          </li>
+          <li id="prod_9">
+            <a href="#"><input id="prod_9" type="checkbox" class="prod_level" name="">
+              自然生產力第9級
+            </a>
+          </li>
+          <li id="prod_10">
+            <a href="#"><input id="prod_10" type="checkbox" class="prod_level" name="">
+              自然生產力第10級
+            </a>
+          </li>
+          <li role="separator" class="divider"></li>
+          <li><a href="#">全部農地</a></li>
+          <li>
+            <a href="#"><input id="good" type="checkbox" class="land_level" name="">適合耕種地</a>
+          </li>
+          <li>
+            <a href="#"><input id="middle" type="checkbox" class="land_level" name="">尚可耕種地</a>
+          </li>
+          <li>
+            <a href="#"><input id="notgood" type="checkbox" class="land_level" name="">不適合耕種地</a>
+          </li>
+        </ul>
+      </div>
+      <div id="PollutionList" class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">污染來源</h3>
+        </div>
+        <div class="panel-body">
+          <ul>
+            <li>
+              <input id="landfill" class="pollut_option" type="checkbox" name="">
+              垃圾掩埋場
+            </li>
+            <li>
+              <input id="incinerator" class="pollut_option" type="checkbox" name="">
+              焚化爐
+            </li>
+            <li>
+              <input id="watersensor" class="pollut_option" type="checkbox" name="">
+              河川污染
+            </li>
+            <li>
+              <input id="airsensor" class="pollut_option" type="checkbox" name="">
+              空氣污染
+            </li>
+          </ul>
+        </div>
+      </div>
+<!--       <div id="MonthSelector" class="dropdown">
+        <button id="CurrentMonthViewer" class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+          選擇月份
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+          <li id="month_1">
+            <a href="#">
+              一月
+            </a>
+          </li>
+          <li id="month_2">
+            <a href="#">
+              二月
+            </a>
+          </li>
+          <li id="month_3">
+            <a href="#">
+              三月
+            </a>
+          </li>
+          <li id="month_4">
+            <a href="#">
+              四月
+            </a>
+          </li>
+          <li id="month_5">
+            <a href="#">
+              五月
+            </a>
+          </li>
+          <li id="month_6">
+            <a href="#">
+              六月
+            </a>
+          </li>
+          <li id="month_7">
+            <a href="#">
+              七月
+            </a>
+          </li>
+          <li id="month_8">
+            <a href="#">
+              八月
+            </a>
+          </li>
+          <li id="month_9">
+            <a href="#">
+              九月
+            </a>
+          </li>
+          <li id="month_10">
+            <a href="#">
+              十月
+            </a>
+          </li>
+          <li id="month_11">
+            <a href="#">
+              十一月
+            </a>
+          </li>
+          <li id="month_12">
+            <a href="#">
+              十二月
+            </a>
+          </li>
+        </ul> -->
+      </div>
+    </aside>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBXBoukH-VILU7j37HB39A0Fws3o1sy4c8&callback=initMap">
+    </script>
+    <script>
+      var map;
+      var infowindow;
+      var caret = '<span class="caret"></span>';
+
+      var area_options = $('#AreaSelector .dropdown-menu > li');
+      var prev_area = null;
+      var chaiyi_areas = {};
+      var current_area_viewer = $('#CurrentAreaViewer');
+
+      var agri_lands = {};
+      var agri_landtypes = ['good', 'middle', 'notgood'];
+      var agri_prod_landtypes = [
+        'prod_4', 'prod_5', 'prod_6', 'prod_7', 'prod_8', 'prod_9', 'prod_10']; 
+      var agri_options = $('#AgriLandSelector .dropdown-menu .land_level');
+      var agri_prod_options = $('#AgriLandSelector .dropdown-menu .prod_level');
+      var current_agri_viewer = $('#CurrentAgriLandViewer');
+
+      var pollution_markers = {};
+      var pollution_options = $('#PollutionList ul .pollut_option');
+      var incinerator_pos   = [
+        { 'lat': 23.4475827, 'lng': 120.2756251 }, // 鹿草焚化爐 
+        { 'lat': 23.443159 , 'lng': 120.441522  }  // 嘉義市焚化爐
+      ];
+      var landfill_pos = [
+        { 'lat': 23.512329,  'lng': 120.336139  }, // 新港鄉公所垃圾掩埋場
+        { 'lat': 23.4496624, 'lng': 120.1913387 }, // 朴子垃圾掩埋場
+        { 'lat': 23.3680606, 'lng': 120.2610332 }, // 大埔垃圾衛生掩埋場
+        { 'lat': 23.550583 , 'lng': 120.506728  }, // 民雄鄉垃圾衛生掩埋場
+        { 'lat': 23.612325 , 'lng': 120.514741  }  // 大林鎮垃圾衛生掩埋場
+      ];
+      var pollution_source_displayinfo  = {
+        'incinerator': [
+          "<div><h3>鹿草焚化爐</h3>" + "</div>",
+          "<div><h3>嘉義市焚化爐</h3>" + "</div>" 
+        ],
+        'landfill': [
+          "<div><h3>新港鄉公所垃圾掩埋場</h3>" + "</div>",
+          "<div><h3>朴子垃圾掩埋場</h3>" + "</div>",
+          "<div><h3>大埔垃圾衛生掩埋場</h3>" + "</div>",
+          "<div><h3>民雄鄉垃圾衛生掩埋場</h3>" + "</div>",
+          "<div><h3>大林鎮垃圾衛生掩埋場</h3>" + "</div>"
+        ],
+        'airsensor': [
+          "<div><h3>民雄工業區監測站</h3>" + "</div>",
+          "<div><h3>嘉義縣環保局監測站</h3>" + "</div>",
+          "<div><h3>中埔鄉圖書館監測站</h3>" + "</div>",
+          "<div><h3>嘉太工業區監測站</h3>" + "</div>",
+          "<div><h3>水上鄉鄉公所監測站</h3>" + "</div>",
+          "<div><h3>東石鄉鄉公所監測站</h3>" + "</div>",
+          "<div><h3>大林生技廠監測站</h3>" + "</div>"
+        ]
+      };
+
+      var current_month = 1;
+      // var month_viewer  = $('#CurrentMonthViewer');
+      // var month_options = $('#MonthSelector .dropdown-menu li');
+      // var watersensor_pos = [
+      //   { 'lat': 23.48111111, 'lng': 120.0041666 }, // 朴子溪台林橋測站
+      //   { 'lat': 23.51388888, 'lng': 122.0078611 }, // 朴子溪牛稠溪橋測站
+      //   { 'lat': 23.48111111, 'lng': 119.9747222 }, // 朴子溪華興橋測站
+      //   { 'lat': 23.56155555, 'lng': 122.0019444 }, // 朴子溪新廍橋測站
+      //   { 'lat': 23.47805555, 'lng': 119.8477777 }, // 朴子溪灣內大橋測站
+      //   { 'lat': 23.48580555, 'lng': 120.1016666 }, // 朴子溪蒜頭大橋測站
+      //   { 'lat': 23.54458333, 'lng': 122.0046944 }, // 朴子溪九十六甲埤測站
+      //   { 'lat': 23.48833333, 'lng': 119.9061111 }, // 朴子溪中洋子大排便橋測站
+      //   { 'lat': 23.53250000, 'lng': 119.8561111 }, // 六腳大排光南橋測站
+      //   { 'lat': 23.46777777, 'lng': 119.7891666 }, // 六腳大排十字橋測站
+      //   { 'lat': 23.57405555, 'lng': 120.4165194 }, // 北港溪過溪橋上游(大埔美僑)測站
+      //   { 'lat': 23.52750000, 'lng': 120.0619444 }, // 北港溪田寮橋測站
+      //   { 'lat': 23.59430555, 'lng': 122.0116666 }, // 北港溪三疊溪橋測站
+      //   { 'lat': 23.60672222, 'lng': 122.0066111 }, // 北港溪溪口橋測站
+      //   { 'lat': 23.61630555, 'lng': 122.0126666 }  // 北港溪西結橋測站
+      // ];
+      var air_pollution = [];
+      var airsensor_pos = [
+        { 'lat': 23.5182954, 'lng': 120.4511574 }, // 嘉義縣民雄鄉中正路68號
+        { 'lat': 23.4579429, 'lng': 120.2910440 }, // 嘉義縣朴子市祥和新村祥和二路西段2之1號
+        { 'lat': 23.4251146, 'lng': 120.5226106 }, // 嘉義縣中埔鄉中埔村中正路128之2號
+        { 'lat': 23.5087590, 'lng': 120.3559940 }, // 嘉義縣太保市嘉太工業區中興路21號
+        { 'lat': 23.4283171, 'lng': 120.3980773 }, // 嘉義縣水上鄉水上村正義路141號
+        { 'lat': 23.4585222, 'lng': 120.1537584 }, // 嘉義縣東石鄉東石村3號
+        { 'lat': 23.6128160, 'lng': 120.4598270 }  // 嘉義縣大林鎮大糖里大湖農場60號
+      ];
+      var airsensor_names = [
+        '民雄工業區', '水上鄉公所', '嘉太工業區', 
+        '中埔鄉圖書館', '嘉義縣環保局', '東石鄉公所', '大林生技廠' 
+      ];
+      var load_airsensor_promise;
+      var load_airsensor_circle_promise;
+
+      /* Activate the UI components */
+      function activateAreaSelector() {
+
+        area_options.on('click', function(res) {
+
+          var area_name = $(this).text();
+          current_area_viewer.html(area_name + caret);
+
+          if (chaiyi_areas[prev_area]) {
+            chaiyi_areas[prev_area].setMap(null);  
+            delete chaiyi_areas[prev_area];
+          }
+          chaiyi_areas[area_name] = new google.maps.KmlLayer({
+            url: 
+            'https://cdn.rawgit.com/yudazilian/ChaiyiAgriAlarm/master/chaiyi/'+area_name+'.kml',
+            map: map
+          });
+          prev_area = area_name;
+        });
+      }
+
+      function activateAgriLandSelector() {
+
+        agri_options.on('click', function(res) {
+
+          var landtype = $(this).attr('id');
+
+          if (this.checked) {
+            for (var i=0; i<agri_lands[landtype].length; i++) {
+              agri_lands[landtype][i].setMap(map);
+            }
+          } else {
+            for (var i=0; i<agri_lands[landtype].length; i++) {
+              agri_lands[landtype][i].setMap(null);
+            }
+          }
+        });
+      }
+
+      function activateAgriLandProdSelector() {
+
+        agri_prod_options.on('click', function(res) {
+
+          var level = $(this).attr('id');
+          
+          if (this.checked) {
+            for (var i=0; i<agri_lands[level].length; i++) 
+              agri_lands[level][i].setMap(map);
+          } else {
+            for (var i=0; i<agri_lands[level].length; i++)
+              agri_lands[level][i].setMap(null);
+          }
+        });
+      }
+
+      function activatePollutionSourceSelector() {
+
+        pollution_options.on('click', function(res) {
+
+          var source_name = $(this).attr('id');
+
+          if (this.checked) {
+            for (var i=0; i<pollution_markers[source_name].length; i++) {
+              for (var j=0; j<pollution_markers[source_name][i].length; j++) {
+                pollution_markers[source_name][i][j].setMap(map);
+              }
+            }
+          } else {
+            for (var i=0; i<pollution_markers[source_name].length; i++) {
+              for (var j=0; j<pollution_markers[source_name][i].length; j++) {
+                pollution_markers[source_name][i][j].setMap(null);
+              }
+            }
+          }
+        });
+      }
+
+      function activateMonthSelector() {
+        month_options.on('click', function() {
+          var chosen_month = $(this).text();
+          month_viewer.html(chosen_month + caret);
+        });
+      }
+
+      function addInfoWindowsToPollutionSource(source_type, source_info) {
+        for (var i=0; i<pollution_markers[source_type].length; i++) {
+          pollution_markers[source_type][i][2].addListener('click', function(event) {
+            infowindow.setContent(this.info);
+            infowindow.setPosition(event.latLng);
+            infowindow.open(map);
+          });
+        }
+      }
+
+      function addInfoWindowsToAirSensor() {
+        load_airsensor_circle_promise.then(function() {
+          
+          for (var i=0; i<pollution_markers['airsensor'].length; i++) {
+            pollution_markers['airsensor'][i][2].addListener('click', function(event) {
+              
+              infowindow.setContent(this.info);
+              infowindow.setPosition(event.latLng);
+              infowindow.open(map);
+            });
+          }
+        });
+      }
+
+      /* Functions for map initialising */
+      function markLands(lands, color) {
+
+        var markedLands = [];
+
+        for (var i=0; i<lands.length; i++) {
+          var coord = [
+            {'lat': lands[i][0][0], 'lng': lands[i][0][1]},
+            {'lat': lands[i][1][0], 'lng': lands[i][1][1]},
+            {'lat': lands[i][2][0], 'lng': lands[i][2][1]},
+            {'lat': lands[i][3][0], 'lng': lands[i][3][1]},
+          ];
+          var land = new google.maps.Polygon({
+            paths: coord,
+            strokeColor: '#000000',
+            strokeOpacity: 0,
+            fillColor: color
+          });
+          markedLands.push(land);
+        }
+        return markedLands
+      }
+
+      function loadAgriLand(level, color) {
+
+        var url_path = ['data', 'agri_land', level].join('/');
+        agri_lands[level] = []; 
+
+        $.ajax({
+          url: url_path,
+          method: 'GET',
+          dataType: 'json'
+        }).done(function(res) {
+          agri_lands[level] = markLands(res, color);
+        });
+      }
+
+      function loadAgriProdLand(prod_level, color) {
+
+        var url_path = ['data', 'agri_productive', 'level', prod_level].join('/');
+        prod_level = 'prod_' + prod_level;
+        agri_lands[prod_level] = [];
+
+        $.ajax({
+          url: url_path,
+          method: 'GET',
+          dataType: 'json'
+        }).done(function(res) {
+          agri_lands[prod_level] = markLands(res, color);
+        });
+      }
+
+      function loadAirPollution() {
+        load_airsensor_promise = new Promise(function(resolve, reject) {
+          $.ajax({
+            url: '/data/air_pollution',
+            method: 'GET',
+            dataType: 'json'
+          }).done(function(data) {
+            air_pollution = data;
+            resolve(data);
+          });
+        });
+      }
+
+      function markLocation(poses, affect_range, type, color) {
+
+        pollution_markers[type] = [];
+
+        for (var i=0; i<poses.length; i++) {
+          var core_circle   = new google.maps.Circle({
+            strokeColor: '#000000',
+            strokeOpacity: 0,
+            fillColor: color,
+            fillOpacity: 0.7,
+            center: poses[i],
+            radius: affect_range,
+          });
+          var middle_circle = new google.maps.Circle({
+            strokeColor: '#000000',
+            strokeOpacity: 0,
+            fillColor: color,
+            fillOpacity: 0.5,
+            center: poses[i],
+            radius: affect_range * 2.5,
+          });
+          var outer_circle  = new google.maps.Circle({
+            strokeColor: '#000000',
+            strokeOpacity: 0,
+            fillColor: color,
+            fillOpacity: 0.2,
+            center: poses[i],
+            radius: affect_range * 5,
+            info: pollution_source_displayinfo[type][i],
+          });
+          pollution_markers[type].push([core_circle, middle_circle, outer_circle]);
+        }
+      }
+
+      function getAirSensorData(name, index) {
+        index = index - 1
+        var sensor_data = air_pollution[index].filter(function(d) {
+          return d['測站名稱'] == name
+        });
+        return sensor_data[0]
+      }
+
+      function markSensorLocation(poses, affect_range, type, color) {
+
+        load_airsensor_promise.then(function(data) {
+
+          load_airsensor_circle_promise = new Promise(function(resolve, reject) {
+
+            pollution_markers[type] = [];
+
+            for (var i=0; i<poses.length; i++) {
+
+              var name = airsensor_names[i];
+              target_data = getAirSensorData(name, current_month);
+              
+              var core_circle = new google.maps.Circle({
+                strokeColor: '#000000',
+                strokeOpacity: 0,
+                fillColor: color,
+                fillOpacity: 0.7,
+                center: poses[i],
+                radius: affect_range,
+              });
+
+              var middle_circle = new google.maps.Circle({
+                strokeColor: '#000000',
+                strokeOpacity: 0,
+                fillColor: color,
+                fillOpacity: 0.5,
+                center: poses[i],
+                radius: affect_range * 2.5,
+              });
+
+              var outer_circle  = new google.maps.Circle({
+                strokeColor: '#000000',
+                strokeOpacity: 0,
+                fillColor: color,
+                fillOpacity: 0.2,
+                center: poses[i],
+                radius: affect_range * 5,
+                info: pollution_source_displayinfo[type][i] + 
+                  '<div>TSP:' +   target_data['TSP'] + '</div>' +
+                  '<div>鉛  :' +  target_data['鉛'] +   '</div>' +
+                  '<div>落塵量:' + target_data['落塵量'] + '</div>'
+              });
+
+              pollution_markers[type].push(
+                [core_circle, middle_circle, outer_circle]);
+            }
+            resolve();
+          });
+
+          load_airsensor_circle_promise.then(function() {
+            
+            for (var i=0; i<pollution_markers['airsensor'].length; i++) {
+            pollution_markers['airsensor'][i][2].addListener('click', function(event) {
+              infowindow.setContent(this.info);
+              infowindow.setPosition(event.latLng);
+              infowindow.open(map);
+            },
+            function() {
+              console.log('failed!');
+            });
+          }
+          });
+
+        });
+      }
+
+      function initMap() {
+
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 11,
+          center: { lat: 23.4801, lng: 120.4491 },
+          mapTypeId: 'terrain',
+          styles: [
+    {
+        "featureType": "administrative",
+        "elementType": "all",
+        "stylers": [
+            {
+                "saturation": "-100"
+            }
+        ]
+    },
+    {
+        "featureType": "administrative.province",
+        "elementType": "all",
+        "stylers": [
+            {
+                "visibility": "off"
+            }
+        ]
+    },
+    {
+        "featureType": "landscape",
+        "elementType": "all",
+        "stylers": [
+            {
+                "saturation": -100
+            },
+            {
+                "lightness": 65
+            },
+            {
+                "visibility": "on"
+            }
+        ]
+    },
+    {
+        "featureType": "poi",
+        "elementType": "all",
+        "stylers": [
+            {
+                "saturation": -100
+            },
+            {
+                "lightness": "50"
+            },
+            {
+                "visibility": "simplified"
+            }
+        ]
+    },
+    {
+        "featureType": "road",
+        "elementType": "all",
+        "stylers": [
+            {
+                "saturation": "-100"
+            }
+        ]
+    },
+    {
+        "featureType": "road.highway",
+        "elementType": "all",
+        "stylers": [
+            {
+                "visibility": "simplified"
+            }
+        ]
+    },
+    {
+        "featureType": "road.arterial",
+        "elementType": "all",
+        "stylers": [
+            {
+                "lightness": "30"
+            }
+        ]
+    },
+    {
+        "featureType": "road.local",
+        "elementType": "all",
+        "stylers": [
+            {
+                "lightness": "40"
+            }
+        ]
+    },
+    {
+        "featureType": "transit",
+        "elementType": "all",
+        "stylers": [
+            {
+                "saturation": -100
+            },
+            {
+                "visibility": "simplified"
+            }
+        ]
+    },
+    {
+        "featureType": "water",
+        "elementType": "geometry",
+        "stylers": [
+            {
+                "hue": "#ffff00"
+            },
+            {
+                "lightness": -25
+            },
+            {
+                "saturation": -97
+            }
+        ]
+    },
+    {
+        "featureType": "water",
+        "elementType": "labels",
+        "stylers": [
+            {
+                "lightness": -25
+            },
+            {
+                "saturation": -100
+            }
+        ]
+    }
+]
+        });
+
+        infowindow = new google.maps.InfoWindow;
+
+        loadAgriLand('good',    '#00ff00');
+        loadAgriLand('middle',  '#0000ff');
+        loadAgriLand('notgood', '#ff0000');
+
+        loadAgriProdLand('4', '#21C7FF');
+        loadAgriProdLand('5', '#00BFFF');
+        loadAgriProdLand('6', '#0099CC');
+        loadAgriProdLand('7', '#25ACFF');
+        loadAgriProdLand('8', '#04A0FF');
+        loadAgriProdLand('9', '#0380CC');
+        loadAgriProdLand('10','#02507F');
+
+        loadAirPollution();
+
+        activateAreaSelector();
+        // activateMonthSelector();
+        activateAgriLandSelector();
+        activateAgriLandProdSelector();
+        activatePollutionSourceSelector();
+
+        markLocation(incinerator_pos, 2000, 'incinerator', '#ffff00');
+        markLocation(landfill_pos,    1000, 'landfill',    '#ff0000');
+        markSensorLocation(airsensor_pos, 1000, 'airsensor', '#00ff00');
+        // markLocation(watersensor_pos, 500 , 'watersensor', '#00ff00');
+
+        addInfoWindowsToPollutionSource('landfill',    pollution_source_displayinfo);
+        addInfoWindowsToPollutionSource('incinerator', pollution_source_displayinfo);
+        // addInfoWindowsToAirSensor(pollution_source_displayinfo);
+        
+      }
+
+    </script>
+    <footer></footer>
+  </body>
+</html>
